@@ -1,2 +1,2 @@
-# latenrgy
-Latenrgy: Model Agnostic Latency and Energy Consumption Prediction for Binary Classifiers
+# Latenrgy: Model Agnostic Latency and Energy Consumption Prediction for Binary Classifiers
+
