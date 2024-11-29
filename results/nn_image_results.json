@@ -1,0 +1,11 @@
+{
+    "Metrics": {
+        "Accuracy": 0.548,
+        "Precision": 0.5355029585798816,
+        "Recall": 0.724,
+        "F1 Score": 0.6156462585034014,
+        "ROC-AUC": 0.542592
+    },
+    "Training Time (s)": 0.5310430526733398,
+    "Energy Consumption (kWh)": 2.0539768187970643e-05
+}
