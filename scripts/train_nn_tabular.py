@@ -48,7 +48,7 @@ optimizer = optim.Adam(model.parameters(), lr=0.001)
 os.makedirs("../../models", exist_ok=True)
 
 # Start energy tracker
-tracker = EmissionsTracker()
+tracker = EmissionsTracker(allow_multiple_runs=True, output_file=f"emissions_nn_tabular.csv")
 tracker.start()
 
 # Train the model

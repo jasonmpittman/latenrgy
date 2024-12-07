@@ -11,7 +11,7 @@ from utils import save_results
 os.makedirs("../../models", exist_ok=True)
 
 # Start energy tracker
-tracker = EmissionsTracker()
+tracker = EmissionsTracker(allow_multiple_runs=True, output_file=f"emissions_knn_tabular.csv")
 tracker.start()
 
 # Train k-NN

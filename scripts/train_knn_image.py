@@ -4,7 +4,7 @@ import time
 from codecarbon import EmissionsTracker
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
-from preprocess_images import X_train, y_train, X_test, y_test
+from preprocess_image import X_train, y_train, X_test, y_test
 from utils import save_results
 
 # Flatten data for k-NN
@@ -15,7 +15,7 @@ X_test_flat = X_test.reshape(len(X_test), -1)
 os.makedirs("../../models", exist_ok=True)
 
 # Start energy tracker
-tracker = EmissionsTracker()
+tracker = EmissionsTracker(allow_multiple_runs=True, output_file=f"emissions_knn_image.csv")
 tracker.start()
 
 # Train k-NN

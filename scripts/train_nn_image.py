@@ -5,7 +5,7 @@ import torch.nn as nn
 import torch.optim as optim
 from codecarbon import EmissionsTracker
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
-from preprocess_images import X_train_torch, y_train_torch, X_test_torch, y_test_torch
+from preprocess_image import X_train_torch, y_train_torch, X_test_torch, y_test_torch
 from utils import save_results
 
 # Neural Network Model
@@ -39,7 +39,7 @@ print(f"Using device: {device}")
 os.makedirs("../../models", exist_ok=True)
 
 # Start energy tracker
-tracker = EmissionsTracker()
+tracker = EmissionsTracker(allow_multiple_runs=True, output_file=f"emissions_nn_image.csv")
 tracker.start()
 
 # Model, Loss, Optimizer
