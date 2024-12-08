@@ -4,7 +4,7 @@ from PIL import Image
 from sklearn.preprocessing import LabelEncoder
 
 # Paths
-DATA_DIR = "../../data/inference_images"
+DATA_DIR = "data/inference_image"
 LABELS = ["hot_dog", "not_hot_dog"]  # Update with actual class names
 IMAGE_SIZE = (64, 64)  # Resize all images to this size (consistent with training)
 
