@@ -5,6 +5,6 @@
         "Recall": 0.624,
         "F1 Score": 0.6198887163561076
     },
-    "Training Time (s)": 0.010686874389648438,
-    "Energy Consumption (kWh)": 7.795351232768237e-08
+    "Training Time (s)": 0.010632514953613281,
+    "Energy Consumption (kWh)": 7.186376579698222e-08
 }
