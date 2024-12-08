@@ -7,7 +7,7 @@ from codecarbon import EmissionsTracker
 import matplotlib.pyplot as plt
 
 # Paths
-DATA_DIR = "data/inference_images"
+DATA_DIR = "data/inference_image"
 MODEL_PATH = "models/svm_image_model.pkl"
 RESULTS_PATH = "results/svm_image_inference_results.json"
 VISUALIZATIONS_DIR = "visualizations/image/svm"
