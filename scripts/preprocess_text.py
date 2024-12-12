@@ -1,61 +1,75 @@
 import os
 import pandas as pd
+import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.preprocessing import LabelEncoder
+import joblib
 
-# Path to the data
-CSV_FILE = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../latenrgy/data/text/McDonald_s_Reviews.csv"))
+# Paths
+TRAINING_DATA_PATH = "data/text/McDonald_s_Reviews.csv"
+PREPROCESSED_X_PATH = "data/text/X_train.npy"
+PREPROCESSED_Y_PATH = "data/text/y_train.npy"
+VECTORIZER_PATH = "models/text_vectorizer.pkl"
+LABEL_ENCODER_PATH = "models/label_encoder.pkl"
 
-# Load the CSV file with ISO-8859-1 encoding
-def load_text_data(csv_file):
+def preprocess_text(data_path, vectorizer_path, label_encoder_path):
     """
-    Load and preprocess text data from the given CSV file.
+    Preprocess text data for training.
 
     Args:
-        csv_file (str): Path to the CSV file.
+        data_path (str): Path to the training text dataset (CSV).
+        vectorizer_path (str): Path to save the trained vectorizer.
+        label_encoder_path (str): Path to save the trained label encoder.
 
     Returns:
-        pd.DataFrame: DataFrame containing preprocessed data.
+        np.ndarray: Preprocessed features.
+        np.ndarray: Encoded labels.
     """
-    try:
-        # Read the file with the correct encoding
-        df = pd.read_csv(csv_file, encoding="ISO-8859-1")
-    except Exception as e:
-        raise ValueError(f"Error loading the file: {e}")
+    print("Loading training data...")
+    df = pd.read_csv(data_path, encoding="ISO-8859-1")
 
-    # Ensure required fields exist
-    if "review" not in df or "rating" not in df:
-        raise ValueError("CSV file must contain 'review' and 'rating' columns.")
+    # Check for required columns
+    if "review" not in df.columns or "rating" not in df.columns:
+        raise ValueError("Dataset must contain 'review' and 'rating' columns!")
 
-    # Map ratings to sentiment (positive or negative)
+    # Convert ratings into sentiments
+    print("Converting ratings into sentiments...")
     df["sentiment"] = df["rating"].apply(lambda x: "positive" if "4" in x or "5" in x else "negative")
+    reviews = df["review"]
+    sentiments = df["sentiment"]
 
-    return df
+    # Create and fit TfidfVectorizer
+    print("Fitting TfidfVectorizer...")
+    vectorizer = TfidfVectorizer(max_features=5000, stop_words="english")
+    X = vectorizer.fit_transform(reviews)
 
-# Load data
-df = load_text_data(CSV_FILE)
+    # Create and fit LabelEncoder
+    print("Fitting LabelEncoder...")
+    label_encoder = LabelEncoder()
+    y = label_encoder.fit_transform(sentiments)
 
-# Split into train and test sets
-from sklearn.model_selection import train_test_split
+    # Save the vectorizer and label encoder
+    print("Saving vectorizer and label encoder...")
+    joblib.dump(vectorizer, vectorizer_path)
+    joblib.dump(label_encoder, label_encoder_path)
 
-X_train, X_test, y_train, y_test = train_test_split(
-    df["review"], df["sentiment"], test_size=0.2, random_state=42, stratify=df["sentiment"]
-)
+    return X, y
 
-# TF-IDF Vectorization
-vectorizer = TfidfVectorizer(max_features=5000)  # Adjust max_features as needed
-X_train_vec = vectorizer.fit_transform(X_train).toarray()
-X_test_vec = vectorizer.transform(X_test).toarray()
+def main():
+    # Preprocess training data
+    print("Preprocessing training text data...")
+    X_train, y_train = preprocess_text(
+        TRAINING_DATA_PATH,
+        VECTORIZER_PATH,
+        LABEL_ENCODER_PATH
+    )
 
-# Encode labels as integers
-label_encoder = LabelEncoder()
-y_train = label_encoder.fit_transform(y_train)
-y_test = label_encoder.transform(y_test)
+    # Save preprocessed data
+    print(f"Saving preprocessed data to {PREPROCESSED_X_PATH} and {PREPROCESSED_Y_PATH}...")
+    np.save(PREPROCESSED_X_PATH, X_train.toarray())
+    np.save(PREPROCESSED_Y_PATH, y_train)
 
-# Save the label mapping for reference
-label_mapping = dict(zip(label_encoder.classes_, label_encoder.transform(label_encoder.classes_)))
-print("Label Mapping:", label_mapping)
+    print("Training text data preprocessing complete.")
 
-# Debug shapes
-print(f"X_train shape: {X_train_vec.shape}, y_train shape: {len(y_train)}")
-print(f"X_test shape: {X_test_vec.shape}, y_test shape: {len(y_test)}")
+if __name__ == "__main__":
+    main()
