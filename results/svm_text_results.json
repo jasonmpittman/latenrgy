@@ -1,10 +1,10 @@
 {
     "Metrics": {
-        "Accuracy": 0.8721556886227545,
-        "Precision": 0.8729393547786747,
-        "Recall": 0.8721556886227545,
-        "F1 Score": 0.8719379613094485
+        "Accuracy": 0.8585329341317365,
+        "Precision": 0.8590980344651,
+        "Recall": 0.8585329341317365,
+        "F1 Score": 0.8583009028239222
     },
-    "Training Time (s)": 2384.1504480838776,
-    "Energy Consumption (kWh)": 0.024548953269439122
+    "Training Time (s)": 3312.793309688568,
+    "Energy Consumption (kWh)": 0.049114653371812714
 }
