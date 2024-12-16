@@ -3,6 +3,7 @@ import shap
 import numpy as np
 import joblib
 import torch
+import torch.nn as nn
 import time
 import argparse
 from multiprocessing import Pool
@@ -16,6 +17,21 @@ SHAP_OUTPUT_DIR = "data/inference_text/shap_values/"
 # Ensure SHAP output directory exists
 os.makedirs(SHAP_OUTPUT_DIR, exist_ok=True)
 
+class TextNN(nn.Module):
+    def __init__(self, input_size, num_classes):
+        super(TextNN, self).__init__()
+        self.fc1 = nn.Linear(input_size, 128)
+        self.fc2 = nn.Linear(128, 2)  # Matches the trained model
+        self.relu = nn.ReLU()
+        self.dropout = nn.Dropout(0.3)
+
+    def forward(self, x):
+        x = self.fc1(x)
+        x = self.relu(x)
+        x = self.dropout(x)
+        x = self.fc2(x)
+        return x
+
 def load_model(model_type):
     """
     Load the trained model based on model type.
@@ -27,7 +43,8 @@ def load_model(model_type):
     elif model_type == "Random Forest":
         return joblib.load(os.path.join(MODELS_DIR, "rf_text_model.pkl"))
     elif model_type == "Neural Network":
-        model = torch.load(os.path.join(MODELS_DIR, "nn_text_model.pth"))
+        model = TextNN(input_size=5000, num_classes=2)  # Update input size to match training
+        model.load_state_dict(torch.load(os.path.join(MODELS_DIR, "nn_text_model.pth")))
         model.eval()  # Set the model to evaluation mode
         return model
     else:
