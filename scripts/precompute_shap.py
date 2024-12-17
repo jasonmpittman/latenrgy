@@ -93,58 +93,72 @@ def compute_shap_values_with_multiprocessing_tree(model, X_data, subset_size=50,
 
 def compute_shap_values(model, X_data, model_type, subset_size=50, nsamples=100, n_jobs=-1):
     """
-    Compute SHAP values for the given model and data using multiprocessing or GPU batching.
+    Compute SHAP values for the given model and data using batching and multiprocessing where applicable.
     """
     X_subset = X_data[:subset_size]
 
-    if model_type in ["SVM", "k-NN"]:
-        print(f"Using KernelExplainer with sampling and multiprocessing for {model_type}...")
-        nsamples = dynamic_sampling(X_subset)  # Adjust sampling dynamically
-        explainer = shap.KernelExplainer(model.predict, X_subset, nsamples=nsamples)
-
-        # Divide data into chunks for multiprocessing
-        num_chunks = 4  # Adjust based on available CPU cores
-        chunks = np.array_split(X_subset, num_chunks)
-
-        # Use multiprocessing to compute SHAP values for each chunk
-        with Pool(processes=num_chunks) as pool:
-            shap_values = pool.starmap(compute_chunk_shap_values, [(explainer, chunk) for chunk in chunks])
-
-        # Flatten the list of shap_values
-        shap_values = np.concatenate(shap_values, axis=0)
+    if model_type in ["k-NN"]:
+        print(f"Using KernelExplainer for {model_type}...")
+        explainer = shap.KernelExplainer(model.predict, X_subset)
+        shap_values = explainer.shap_values(X_data, nsamples=nsamples)
 
     elif model_type == "Random Forest":
         print(f"Using TreeExplainer for {model_type} with multiprocessing...")
         shap_values = compute_shap_values_with_multiprocessing_tree(
-            model, X_data, subset_size=subset_size, num_chunks=os.cpu_count()   
+            model, X_data, subset_size=subset_size, num_chunks=os.cpu_count()
         )
-
 
     elif model_type == "Neural Network":
         print(f"Using DeepExplainer with GPU batching for {model_type}...")
-        # Move model and data to GPU
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         model.to(device)
         model.eval()
-
         X_subset_tensor = torch.tensor(X_subset, dtype=torch.float32).to(device)
         explainer = shap.DeepExplainer(model, X_subset_tensor)
 
-        # Batch processing
+        # Batch processing for SHAP values
         batch_size = 10
         shap_values = []
-        for i in range(0, X_subset_tensor.size(0), batch_size):
-            batch = X_subset_tensor[i:i+batch_size]
-            shap_values_batch = explainer.shap_values(batch)
+        for i in range(0, len(X_data), batch_size):
+            batch = X_data[i:i + batch_size]
+            batch_tensor = torch.tensor(batch, dtype=torch.float32).to(device)
+            shap_values_batch = explainer.shap_values(batch_tensor)
             shap_values.append(shap_values_batch)
 
-        # Concatenate results
         shap_values = np.concatenate(shap_values, axis=0)
+
+    elif model_type == "SVM":
+        print(f"Using KernelExplainer for {model_type} with batching and multiprocessing...")
+
+        # Use a subset of data as the background dataset for KernelExplainer
+        X_subset = X_data[:subset_size]
+
+        # Divide the dataset into batches
+        batch_size = 50  # Adjust based on available memory and runtime
+        batches = [X_data[i:i + batch_size] for i in range(0, len(X_data), batch_size)]
+        num_batches = len(batches)
+        print(f"Divided data into {num_batches} batches of size {batch_size}.")
+
+        # Use multiprocessing to compute SHAP values for each batch
+        with Pool(processes=4) as pool:  # Adjust 'processes' to match available CPU cores
+            shap_values_batches = pool.starmap(compute_shap_batch, [(batch, model, X_subset, nsamples) for batch in batches])
+
+        # Combine the SHAP values from all batches
+        shap_values = np.concatenate(shap_values_batches, axis=0)
 
     else:
         raise ValueError(f"Unsupported model type: {model_type}")
 
     return shap_values
+
+# Define the batch processing function
+def compute_shap_batch(batch, model, X_subset, nsamples):
+    """
+    Compute SHAP values for a single batch using KernelExplainer.
+    """
+    explainer = shap.KernelExplainer(model.predict, X_subset)
+    return explainer.shap_values(batch, nsamples=nsamples)
+
 
 def precompute_shap(model_type, dataset="text", subset_size=50, nsamples=100):
     """
