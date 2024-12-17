@@ -1,0 +1,10 @@
+{
+    "Latency (s)": 19.471810579299927,
+    "Energy Consumption (kWh)": 0.0006955205442107477,
+    "Metrics": {
+        "Accuracy": 0.9,
+        "Precision": 0.9173310225303293,
+        "Recall": 0.9,
+        "F1 Score": 0.8994584207549213
+    }
+}

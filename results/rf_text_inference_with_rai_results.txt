@@ -1,0 +1,7 @@
+--- Random Forest Text Inference with RAI Results ---
+Accuracy: 0.8040
+F1 Score: 0.7694
+Precision: 1.0000
+Recall: 0.6252
+Total Latency: 0.0436 seconds
+Energy Consumption: 0.0000 kWh

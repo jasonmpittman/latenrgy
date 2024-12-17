@@ -1,0 +1,7 @@
+--- k-NN Text Inference with RAI Results ---
+Accuracy: 0.8960
+F1 Score: 0.9096
+Precision: 0.8341
+Recall: 1.0000
+Total Latency: 0.7908 seconds
+Energy Consumption: 0.0000 kWh

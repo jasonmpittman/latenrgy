@@ -1,0 +1,7 @@
+--- Neural Network Text Inference with RAI Results ---
+Accuracy: 0.9000
+F1 Score: 0.8943
+Precision: 1.0000
+Recall: 0.8088
+Total Latency: 0.0109 seconds
+Energy Consumption: 0.0000 kWh

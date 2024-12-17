@@ -1,0 +1,7 @@
+--- SVM Text Inference with RAI Results ---
+Accuracy: 0.9000
+F1 Score: 0.8943
+Precision: 1.0000
+Recall: 0.8088
+Total Latency: 20.0201 seconds
+Energy Consumption: 0.0007 kWh
