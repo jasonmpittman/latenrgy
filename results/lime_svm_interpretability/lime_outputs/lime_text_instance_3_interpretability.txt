@@ -1,0 +1,5 @@
+--- LIME Interpretability for Instance 3 ---
+Input Text: [0. 0. 0. ... 0. 0. 0.]
+
+Feature Contributions:
+0: -0.0000

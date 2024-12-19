@@ -1,0 +1,6 @@
+Accuracy: 0.8040
+Precision: 1.0000
+Recall: 0.6252
+F1-Score: 0.7694
+Latency (s/sample): 0.0072
+Energy Consumption (kWh): 0.0002
